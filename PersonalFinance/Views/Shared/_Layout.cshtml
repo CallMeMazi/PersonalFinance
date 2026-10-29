@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@(ViewData["Title"] ?? "داشبورد") | مدیریت مالی شخصی</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="app-body">
+    <div class="app-shell">
+        <aside class="app-sidebar d-none d-lg-flex">
+            <div class="brand">
+                <span class="brand-mark">م</span>
+                <div>
+                    <strong>مدیریت مالی شخصی</strong>
+                    <small>PersonalFinance</small>
+                </div>
+            </div>
+            <partial name="_NavLinks" />
+        </aside>
+        <div class="app-main">
+            <header class="app-topbar">
+                <div class="d-flex align-items-center gap-2">
+                    <button class="menu-btn d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileNav" aria-label="باز کردن منو">منو</button>
+                    <div>
+                        <div class="eyebrow">@(ViewData["Eyebrow"] ?? "برنامه محلی مدیریت مالی")</div>
+                        <div class="fw-bold">@(ViewData["Title"] ?? "داشبورد")</div>
+                    </div>
+                </div>
+                <div class="text-muted">@PersianDateHelper.FullDateLabel(DateTime.Today)</div>
+            </header>
+            <main class="app-content">
+                @if (TempData["Success"] is string success)
+                {
+                    <div class="alert alert-success">@success</div>
+                }
+                @if (TempData["Error"] is string error)
+                {
+                    <div class="alert alert-danger">@error</div>
+                }
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileNav">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">منو</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="بستن"></button>
+        </div>
+        <div class="offcanvas-body">
+            <partial name="_NavLinks" />
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/chartjs/chart.umd.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

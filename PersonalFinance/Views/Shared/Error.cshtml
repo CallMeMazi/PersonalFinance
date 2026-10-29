@@ -1,0 +1,13 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "خطا";
+}
+
+<div class="panel">
+    <h1>خطایی رخ داد</h1>
+    <p class="lede">پردازش درخواست با مشکل روبه‌رو شد.</p>
+    @if (Model.ShowRequestId)
+    {
+        <p class="text-muted">شناسه درخواست: <code>@Model.RequestId</code></p>
+    }
+</div>

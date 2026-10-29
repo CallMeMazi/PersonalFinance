@@ -1,0 +1,115 @@
+﻿@model DashboardViewModel
+@{
+    ViewData["Title"] = "داشبورد";
+    ViewData["Eyebrow"] = "نمای سریع وضعیت مالی و کاری";
+}
+
+<div class="page-hero">
+    <div>
+        <p class="eyebrow">@Model.TodayLabel</p>
+        <h1>وضعیت امروز شما</h1>
+        <p class="lede">در یک نگاه ببینید این ماه چقدر کار کرده‌اید، چقدر درآمد داشته‌اید، چه مقدار خرج کرده‌اید و نسبت به هدف کاری‌تان کجا ایستاده‌اید.</p>
+    </div>
+    <div class="page-actions">
+        <a class="btn btn-primary" asp-controller="WorkLogs" asp-action="Create">ثبت ساعت کاری</a>
+        <a class="btn btn-outline-light" asp-controller="Expenses" asp-action="Create">ثبت هزینه</a>
+    </div>
+</div>
+
+@if (Model.CurrentRate <= 0)
+{
+    <div class="alert alert-warning">نرخ درآمد ساعتی هنوز صفر است. از صفحه درآمد ساعتی مقدار واقعی را تنظیم کنید.</div>
+}
+
+<div class="stat-grid">
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "درآمد این ماه", Value = FormatHelper.TomanWithUnit(Model.Month.ActualIncome), Tone = "income" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "هزینه‌های این ماه", Value = FormatHelper.TomanWithUnit(Model.Month.ExpensesTotal), Tone = "expense" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "خالص درآمد ماه", Value = FormatHelper.TomanWithUnit(Model.Month.NetIncome), Tone = Model.Month.NetIncome < 0 ? "expense" : "income" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "ساعات کارکرد این ماه", Value = FormatHelper.Hours(Model.Month.ActualHours) + " ساعت", Tone = "info" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "ساعات باقی‌مانده تا هدف ماه", Value = Model.Month.HasGoal ? FormatHelper.Hours(Model.Month.RemainingHours) + " ساعت" : "هدف تنظیم نشده", Tone = "warning" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "درصد پیشرفت هدف کاری", Value = Model.Month.ProgressPercent is null ? "—" : FormatHelper.Percent(Model.Month.ProgressPercent.Value), Tone = "accent" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "درآمد مورد انتظار", Value = Model.Month.ExpectedIncome is null ? "—" : FormatHelper.TomanWithUnit(Model.Month.ExpectedIncome.Value), Tone = "primary" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "اختلاف درآمد واقعی و هدف", Value = Model.Month.IncomeDifference is null ? "—" : FormatHelper.SignedToman(Model.Month.IncomeDifference.Value), Tone = Model.Month.IncomeDifference is < 0 ? "warning" : "income" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "بودجه مصرف‌شده", Value = FormatHelper.TomanWithUnit(Model.Month.ConsumedBudgetTotal), Tone = "expense" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "مانده بودجه دسته‌ها", Value = FormatHelper.TomanWithUnit(Model.Month.RemainingBudgetTotal), Tone = "income" }' />
+</div>
+
+<div class="split-2">
+    <div class="panel">
+        <h2 class="panel-title">روند شش ماه اخیر</h2>
+        <div class="chart-box"><canvas id="trendChart"></canvas></div>
+    </div>
+    <div class="panel">
+        <h2 class="panel-title">توزیع هزینه این ماه</h2>
+        <div class="chart-box"><canvas id="categoryChart"></canvas></div>
+    </div>
+</div>
+
+<div class="panel">
+    <h2 class="panel-title">هفته جاری</h2>
+    <p class="text-muted">@Model.Week.RangeLabel</p>
+    <div class="stat-grid">
+        <partial name="_StatCard" model='new StatCardViewModel { Title = "ساعات هفته", Value = FormatHelper.Hours(Model.Week.ActualHours) + " از " + (Model.Week.HasGoal ? FormatHelper.Hours(Model.Week.TargetHours!.Value) : "—"), Tone = "info" }' />
+        <partial name="_StatCard" model='new StatCardViewModel { Title = "درآمد هفته", Value = FormatHelper.TomanWithUnit(Model.Week.ActualIncome), Tone = "income" }' />
+        <partial name="_StatCard" model='new StatCardViewModel { Title = "هزینه هفته", Value = FormatHelper.TomanWithUnit(Model.Week.ExpensesTotal), Tone = "expense" }' />
+        <partial name="_StatCard" model='new StatCardViewModel { Title = "خالص هفته", Value = FormatHelper.TomanWithUnit(Model.Week.NetIncome), Tone = "primary" }' />
+    </div>
+</div>
+
+<partial name="_BudgetTable" model="Model.Month" />
+
+<div class="split-2">
+    <div class="panel">
+        <h2 class="panel-title">آخرین ساعات کاری</h2>
+        @if (!Model.RecentWorkLogs.Any())
+        {
+            <partial name="_EmptyState" model='"هنوز ساعت کاری ثبت نشده است."' />
+        }
+        else
+        {
+            <table class="table">
+                <thead><tr><th>تاریخ</th><th>ساعت</th><th>درآمد</th></tr></thead>
+                <tbody>
+                @foreach (var item in Model.RecentWorkLogs)
+                {
+                    <tr>
+                        <td>@PersianDateHelper.ToShamsiDisplay(item.WorkDate)</td>
+                        <td>@FormatHelper.Hours(item.Hours)</td>
+                        <td class="text-income">@FormatHelper.TomanWithUnit(item.Income)</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
+    </div>
+    <div class="panel">
+        <h2 class="panel-title">آخرین هزینه‌ها</h2>
+        @if (!Model.RecentExpenses.Any())
+        {
+            <partial name="_EmptyState" model='"هنوز هزینه‌ای ثبت نشده است."' />
+        }
+        else
+        {
+            <table class="table">
+                <thead><tr><th>تاریخ</th><th>دسته</th><th>مبلغ</th></tr></thead>
+                <tbody>
+                @foreach (var item in Model.RecentExpenses)
+                {
+                    <tr>
+                        <td>@PersianDateHelper.ToShamsiDisplay(item.OccurredOn)</td>
+                        <td>@item.CategoryTitle</td>
+                        <td class="text-expense">@FormatHelper.TomanWithUnit(item.Amount)</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+<script type="application/json" id="trendLabels">@Html.Raw(Model.TrendLabelsJson)</script>
+<script type="application/json" id="trendIncome">@Html.Raw(Model.TrendIncomeJson)</script>
+<script type="application/json" id="trendExpense">@Html.Raw(Model.TrendExpenseJson)</script>
+<script type="application/json" id="categoryLabels">@Html.Raw(Model.CategoryLabelsJson)</script>
+<script type="application/json" id="categoryValues">@Html.Raw(Model.CategoryValuesJson)</script>
+<script type="application/json" id="categoryColors">@Html.Raw(Model.CategoryColorsJson)</script>

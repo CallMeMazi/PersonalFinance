@@ -1,0 +1,23 @@
+@model ExpenseFormViewModel
+@{
+    ViewData["Title"] = "ویرایش هزینه";
+}
+
+<div class="page-hero">
+    <div>
+        <h1>ویرایش هزینه</h1>
+    </div>
+</div>
+
+<div class="panel">
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="Id" />
+        <partial name="_ExpenseForm" />
+        <button class="btn btn-primary" type="submit">ذخیره تغییرات</button>
+        <a class="btn btn-outline-light" asp-action="Index">انصراف</a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

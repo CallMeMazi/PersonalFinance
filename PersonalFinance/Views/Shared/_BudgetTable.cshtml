@@ -1,0 +1,60 @@
+@model PeriodReportViewModel
+<div class="panel">
+    <h2 class="panel-title">بودجه دسته‌ها</h2>
+    <p class="text-muted mb-3">تخصیص درآمد به‌معنی هزینه‌شدن پول نیست. بودجه هر دسته از درآمد تحقق‌یافته این بازه محاسبه می‌شود.</p>
+    @if (!Model.BudgetRows.Any())
+    {
+        <partial name="_EmptyState" model='"هنوز دسته‌بندی‌ای تعریف نشده است."' />
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>دسته</th>
+                        <th>درصد</th>
+                        <th>بودجه تخصیص‌یافته</th>
+                        <th>هزینه واقعی</th>
+                        <th>مانده / تجاوز</th>
+                        <th>مصرف</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var row in Model.BudgetRows)
+                {
+                    <tr class="@(row.IsOverBudget ? "over" : null)">
+                        <td>
+                            <span class="color-dot" style="background:@row.Color"></span>
+                            @row.Icon @row.Title
+                            @if (row.IsUnallocated)
+                            {
+                                <span class="badge-soft">باقی‌مانده تخصیص</span>
+                            }
+                        </td>
+                        <td>@FormatHelper.Percent(row.AllocationPercent)</td>
+                        <td>@FormatHelper.TomanWithUnit(row.AllocatedBudget)</td>
+                        <td class="text-expense">@FormatHelper.TomanWithUnit(row.ActualExpense)</td>
+                        <td>
+                            @if (row.IsOverBudget)
+                            {
+                                <span class="text-expense">تجاوز @FormatHelper.TomanWithUnit(row.Overspent)</span>
+                            }
+                            else
+                            {
+                                <span class="text-income">مانده @FormatHelper.TomanWithUnit(row.Remaining)</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="progress pf-progress mb-1">
+                                <div class="progress-bar @(row.IsOverBudget ? "over" : null)" style="width: @(Math.Min(100, row.UsagePercent))%"></div>
+                            </div>
+                            @FormatHelper.Percent(row.UsagePercent)
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

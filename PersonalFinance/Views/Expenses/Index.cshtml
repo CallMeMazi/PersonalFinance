@@ -1,0 +1,85 @@
+@model ExpenseListViewModel
+@{
+    ViewData["Title"] = "هزینه‌ها";
+}
+
+<div class="page-hero">
+    <div>
+        <h1>مدیریت هزینه‌ها</h1>
+        <p class="lede">هزینه‌ها را با تاریخ شمسی، دسته‌بندی و توضیحات ثبت کنید. مجموع فیلتر فعلی در کارت بالا دیده می‌شود.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create">ثبت هزینه</a>
+</div>
+
+<div class="panel">
+    <form method="get" class="filter-bar">
+        <div>
+            <label class="form-label">از تاریخ</label>
+            <input class="form-control" dir="ltr" name="from" value="@Model.FromPersian" placeholder="1404/08/01" />
+        </div>
+        <div>
+            <label class="form-label">تا تاریخ</label>
+            <input class="form-control" dir="ltr" name="to" value="@Model.ToPersian" placeholder="1404/08/30" />
+        </div>
+        <div>
+            <label class="form-label">دسته‌بندی</label>
+            <select name="categoryId" class="form-select" asp-items="Model.Categories">
+                <option value="">همه دسته‌ها</option>
+            </select>
+        </div>
+        <div>
+            <label class="form-label">جست‌وجوی توضیحات</label>
+            <input class="form-control" name="q" value="@Model.Query" />
+        </div>
+        <div>
+            <button class="btn btn-outline-light" type="submit">اعمال فیلتر</button>
+        </div>
+    </form>
+</div>
+
+<div class="stat-grid">
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "مجموع هزینه‌های فیلتر فعلی", Value = FormatHelper.TomanWithUnit(Model.TotalAmount), Tone = "expense" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "تعداد موارد", Value = FormatHelper.ToPersianDigits(Model.Items.Count.ToString()), Tone = "info" }' />
+</div>
+
+<div class="panel">
+    @if (!Model.Items.Any())
+    {
+        <partial name="_EmptyState" model='"هزینه‌ای با این فیلتر پیدا نشد."' />
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>تاریخ</th>
+                        <th>دسته</th>
+                        <th>مبلغ</th>
+                        <th>توضیحات</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@PersianDateHelper.ToShamsiDisplay(item.OccurredOn)</td>
+                        <td><span class="color-dot" style="background:@item.CategoryColor"></span> @item.CategoryTitle</td>
+                        <td class="text-expense">@FormatHelper.TomanWithUnit(item.Amount)</td>
+                        <td>@(item.Description ?? "—")</td>
+                        <td>
+                            <div class="table-actions">
+                                <a class="btn btn-sm btn-outline-light" asp-action="Edit" asp-route-id="@item.Id">ویرایش</a>
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="js-confirm-delete" data-message="این هزینه حذف شود؟">
+                                    <button class="btn btn-sm btn-danger" type="submit">حذف</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

@@ -1,0 +1,23 @@
+@model ExpenseFormViewModel
+<div class="mb-3">
+    <label asp-for="Amount" class="form-label"></label>
+    <input asp-for="Amount" class="form-control" type="number" step="1" min="1" inputmode="numeric" />
+    <span asp-validation-for="Amount" class="text-danger"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="PersianDate" class="form-label"></label>
+    <input asp-for="PersianDate" class="form-control" dir="ltr" placeholder="1404/08/10" autocomplete="off" />
+    <span asp-validation-for="PersianDate" class="text-danger"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="CategoryId" class="form-label"></label>
+    <select asp-for="CategoryId" asp-items="Model.Categories" class="form-select">
+        <option value="">انتخاب دسته</option>
+    </select>
+    <span asp-validation-for="CategoryId" class="text-danger"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="Description" class="form-label"></label>
+    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+    <span asp-validation-for="Description" class="text-danger"></span>
+</div>

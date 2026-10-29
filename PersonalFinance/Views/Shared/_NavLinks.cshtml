@@ -1,0 +1,45 @@
+@{
+    string Active(string key) => string.Equals(ViewBag.Active as string, key, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+}
+<nav class="side-nav">
+    <div class="nav-section">نمای کلی</div>
+    <a class="nav-link @Active("dashboard")" asp-controller="Home" asp-action="Index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1z"/></svg>
+        داشبورد
+    </a>
+    <a class="nav-link @Active("income")" asp-controller="HourlyRate" asp-action="Index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 7v10M9.5 9.5c.8-1 4.2-1 5 1s-1.3 2.5-2.5 2.5 3.3.7 2.5 2.5-4.2 1-5-1"/></svg>
+        درآمد ساعتی
+    </a>
+    <div class="nav-section">کار و اهداف</div>
+    <a class="nav-link @Active("worklogs")" asp-controller="WorkLogs" asp-action="Index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
+        ساعات کاری
+    </a>
+    <a class="nav-link @Active("weekly")" asp-controller="WeeklyPlans" asp-action="Index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>
+        برنامه هفتگی
+    </a>
+    <a class="nav-link @Active("monthly")" asp-controller="MonthlyGoals" asp-action="Index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 19V6h14v13H5z"/><path d="M5 10h14M9 6v4"/></svg>
+        هدف ماهانه
+    </a>
+    <div class="nav-section">هزینه‌ها</div>
+    <a class="nav-link @Active("expenses")" asp-controller="Expenses" asp-action="Index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>
+        ثبت هزینه
+    </a>
+    <a class="nav-link @Active("categories")" asp-controller="Categories" asp-action="Index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h7v7H4zM13 7h7v4h-7zM13 13h7v7h-7zM4 16h7v4H4z"/></svg>
+        دسته‌بندی‌ها
+    </a>
+    <div class="nav-section">گزارش‌ها</div>
+    <a class="nav-link @Active("weekly-report")" asp-controller="Reports" asp-action="Weekly">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 19V9M10 19V5M15 19v-7M20 19V8"/></svg>
+        گزارش هفتگی
+    </a>
+    <a class="nav-link @Active("monthly-report")" asp-controller="Reports" asp-action="Monthly">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19h16M6 16l3-5 3 3 4-7 2 3"/></svg>
+        گزارش ماهانه
+    </a>
+</nav>

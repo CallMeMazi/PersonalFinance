@@ -1,0 +1,23 @@
+@model WorkLogFormViewModel
+@{
+    ViewData["Title"] = "ثبت ساعت کاری";
+}
+
+<div class="page-hero">
+    <div>
+        <h1>ثبت ساعت کاری</h1>
+        <p class="lede">برای هر روز فقط یک مجموع ساعات ثبت می‌شود. نرخ فعلی در همین لحظه روی این رکورد ذخیره خواهد شد.</p>
+    </div>
+</div>
+
+<div class="panel">
+    <form asp-action="Create" method="post">
+        <partial name="_WorkLogForm" />
+        <button class="btn btn-primary" type="submit">ذخیره</button>
+        <a class="btn btn-outline-light" asp-action="Index">انصراف</a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

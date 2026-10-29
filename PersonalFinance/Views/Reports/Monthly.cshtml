@@ -1,0 +1,55 @@
+@model MonthlyReportPageViewModel
+@{
+    ViewData["Title"] = "گزارش ماهانه";
+}
+
+<div class="page-hero">
+    <div>
+        <h1>گزارش ماهانه</h1>
+        <p class="lede">گروه‌بندی این گزارش بر اساس ماه شمسی است، نه ماه میلادی. بازه: @Model.Report.RangeLabel</p>
+    </div>
+</div>
+
+<div class="panel">
+    <form method="get" class="filter-bar">
+        <div>
+            <label class="form-label">ماه و سال شمسی</label>
+            <select class="form-select" name="monthKey" onchange="applyMonth(this)">
+                @foreach (var item in Model.MonthOptions)
+                {
+                    var selected = item.Year == Model.Year && item.Month == Model.Month;
+                    if (selected)
+                    {
+                        <option value="@item.Year-@item.Month" selected>@item.Title</option>
+                    }
+                    else
+                    {
+                        <option value="@item.Year-@item.Month">@item.Title</option>
+                    }
+                }
+            </select>
+            <input type="hidden" name="year" value="@Model.Year" />
+            <input type="hidden" name="month" value="@Model.Month" />
+        </div>
+    </form>
+</div>
+
+<partial name="_PeriodSummary" model="Model.Report" />
+
+<div class="stat-grid">
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "عقب‌ماندگی یا اضافه‌کاری", Value = Model.Report.HasGoal ? FormatHelper.Hours(Model.Report.HoursDifference) + " ساعت" : "هدف تنظیم نشده", Tone = Model.Report.HoursDifference < 0 ? "warning" : "income" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "مبالغ فراتر از بودجه", Value = FormatHelper.TomanWithUnit(Model.Report.OverspentTotal), Tone = "expense" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "مانده بودجه‌ها", Value = FormatHelper.TomanWithUnit(Model.Report.RemainingBudgetTotal), Tone = "income" }' />
+</div>
+
+<partial name="_BudgetTable" model="Model.Report" />
+
+<script>
+    function applyMonth(select) {
+        var parts = select.value.split("-");
+        var form = select.form;
+        form.year.value = parts[0];
+        form.month.value = parts[1];
+        form.submit();
+    }
+</script>

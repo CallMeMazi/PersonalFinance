@@ -1,0 +1,138 @@
+@model WorkLogListViewModel
+@{
+    ViewData["Title"] = "ساعات کاری";
+}
+
+<div class="page-hero">
+    <div>
+        <h1>ثبت ساعات کاری روزانه</h1>
+        <p class="lede">برای هر روز یک رکورد مجموع ساعات نگه داشته می‌شود. درآمد هر روز با نرخ ذخیره‌شده همان ثبت محاسبه می‌گردد.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create">ثبت ساعت جدید</a>
+</div>
+
+<div class="panel">
+    <form method="get" class="filter-bar">
+        <div>
+            <label class="form-label">نوع فیلتر</label>
+            <select name="filter" class="form-select" onchange="this.form.submit()">
+                @if (Model.Filter == "week")
+                {
+                    <option value="month">ماه شمسی</option>
+                    <option value="week" selected>هفته شمسی</option>
+                }
+                else
+                {
+                    <option value="month" selected>ماه شمسی</option>
+                    <option value="week">هفته شمسی</option>
+                }
+            </select>
+        </div>
+        @if (Model.Filter == "week")
+        {
+            <div>
+                <label class="form-label">هفته</label>
+                <select name="week" class="form-select" onchange="this.form.submit()">
+                    @foreach (var week in Model.WeekOptions)
+                    {
+                        if (week.WeekStart == Model.WeekStart)
+                        {
+                            <option value="@week.WeekStart.ToString("yyyy-MM-dd")" selected>@week.Label</option>
+                        }
+                        else
+                        {
+                            <option value="@week.WeekStart.ToString("yyyy-MM-dd")">@week.Label</option>
+                        }
+                    }
+                </select>
+            </div>
+        }
+        else
+        {
+            <div>
+                <label class="form-label">ماه</label>
+                <select class="form-select" name="monthSelect" onchange="applyMonth(this)">
+                    @foreach (var item in Model.MonthOptions)
+                    {
+                        var selected = item.Year == Model.Year && item.Month == Model.Month;
+                        if (selected)
+                        {
+                            <option value="@item.Year-@item.Month" selected>@item.Title</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Year-@item.Month">@item.Title</option>
+                        }
+                    }
+                </select>
+                <input type="hidden" name="year" value="@Model.Year" />
+                <input type="hidden" name="month" value="@Model.Month" />
+            </div>
+        }
+        <div>
+            <button class="btn btn-outline-light" type="submit">اعمال فیلتر</button>
+        </div>
+    </form>
+</div>
+
+<div class="stat-grid">
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "بازه", Value = Model.RangeLabel, Tone = "primary" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "مجموع ساعات", Value = FormatHelper.Hours(Model.TotalHours) + " ساعت", Tone = "info" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "مجموع درآمد", Value = FormatHelper.TomanWithUnit(Model.TotalIncome), Tone = "income" }' />
+</div>
+
+<div class="panel">
+    @if (!Model.Items.Any())
+    {
+        <partial name="_EmptyState" model='"در این بازه ساعت کاری ثبت نشده است."' />
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>تاریخ</th>
+                        <th>روز</th>
+                        <th>ساعات</th>
+                        <th>نرخ استفاده‌شده</th>
+                        <th>درآمد روز</th>
+                        <th>توضیحات</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@PersianDateHelper.ToShamsiDisplay(item.WorkDate)</td>
+                        <td>@PersianDateHelper.WeekdayName(item.WorkDate)</td>
+                        <td>@FormatHelper.Hours(item.Hours)</td>
+                        <td>@FormatHelper.TomanWithUnit(item.HourlyRateUsed)</td>
+                        <td class="text-income">@FormatHelper.TomanWithUnit(item.Income)</td>
+                        <td>@(item.Description ?? "—")</td>
+                        <td>
+                            <div class="table-actions">
+                                <a class="btn btn-sm btn-outline-light" asp-action="Edit" asp-route-id="@item.Id">ویرایش</a>
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="js-confirm-delete" data-message="این ثبت ساعت کاری حذف شود؟">
+                                    <button class="btn btn-sm btn-danger" type="submit">حذف</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<script>
+    function applyMonth(select) {
+        var parts = select.value.split("-");
+        var form = select.form;
+        form.year.value = parts[0];
+        form.month.value = parts[1];
+        form.submit();
+    }
+</script>

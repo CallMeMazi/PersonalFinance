@@ -1,0 +1,23 @@
+@model CategoryFormViewModel
+@{
+    ViewData["Title"] = "دسته جدید";
+}
+
+<div class="page-hero">
+    <div>
+        <h1>ایجاد دسته‌بندی</h1>
+        <p class="lede">مجموع درصدها نمی‌تواند از ۱۰۰ بیشتر شود.</p>
+    </div>
+</div>
+
+<div class="panel">
+    <form asp-action="Create" method="post">
+        <partial name="_CategoryForm" />
+        <button class="btn btn-primary" type="submit">ذخیره</button>
+        <a class="btn btn-outline-light" asp-action="Index">انصراف</a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

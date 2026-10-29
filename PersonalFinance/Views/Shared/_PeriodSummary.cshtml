@@ -1,0 +1,35 @@
+@model PeriodReportViewModel
+<div class="stat-grid">
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "ساعات واقعی", Value = FormatHelper.Hours(Model.ActualHours) + " ساعت", Tone = "info" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "ساعات هدف", Value = Model.HasGoal ? FormatHelper.Hours(Model.TargetHours!.Value) + " ساعت" : "تنظیم نشده", Tone = "primary", Hint = Model.HasGoal ? null : "ابتدا هدف این بازه را تعیین کنید." }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "پیشرفت کاری", Value = Model.ProgressPercent is null ? "—" : FormatHelper.Percent(Model.ProgressPercent.Value), Tone = "accent", Hint = Model.HasGoal ? (Model.OvertimeHours > 0 ? "مازاد " + FormatHelper.Hours(Model.OvertimeHours) + " ساعت" : "باقی‌مانده " + FormatHelper.Hours(Model.RemainingHours) + " ساعت") : null }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "درآمد واقعی", Value = FormatHelper.TomanWithUnit(Model.ActualIncome), Tone = "income", Hint = "بر اساس نرخ ذخیره‌شده هر ثبت کاری" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "درآمد مورد انتظار", Value = Model.ExpectedIncome is null ? "—" : FormatHelper.TomanWithUnit(Model.ExpectedIncome.Value), Tone = "primary", Hint = "ساعات هدف × نرخ مؤثر بازه" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "اختلاف درآمد", Value = Model.IncomeDifference is null ? "—" : FormatHelper.SignedToman(Model.IncomeDifference.Value), Tone = Model.IncomeDifference is < 0 ? "warning" : "income" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "هزینه‌ها", Value = FormatHelper.TomanWithUnit(Model.ExpensesTotal), Tone = "expense" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "خالص درآمد", Value = FormatHelper.TomanWithUnit(Model.NetIncome), Tone = Model.NetIncome < 0 ? "expense" : "income" }' />
+</div>
+
+@if (Model.HasGoal)
+{
+    <div class="panel">
+        <h2 class="panel-title">وضعیت هدف کاری</h2>
+        <div class="progress pf-progress mb-2">
+            <div class="progress-bar @(Model.ProgressPercent > 100 ? "over" : null)" style="width: @(Math.Min(100, Model.ProgressPercent ?? 0))%"></div>
+        </div>
+        <p class="mb-2">@Model.WorkStatus</p>
+        @if (Model.RemainingHours > 0)
+        {
+            <p class="text-warning mb-1">عقب‌ماندگی ساعات: @FormatHelper.Hours(Model.RemainingHours) ساعت — درآمد احتمالی ازدست‌رفته: @FormatHelper.TomanWithUnit(Model.PotentialMissedIncome). این زیان مالی واقعی نیست.</p>
+        }
+        @if (Model.OvertimeHours > 0)
+        {
+            <p class="text-income mb-1">ساعات مازاد: @FormatHelper.Hours(Model.OvertimeHours) ساعت — درآمد مازاد تقریبی: @FormatHelper.TomanWithUnit(Model.ExtraIncome)</p>
+        }
+        <p class="text-muted mb-0">@Model.FinanceStatus نرخ مؤثر این بازه @FormatHelper.TomanWithUnit(Model.EffectiveRate) است؛ اگر ثبت کاری نباشد از نرخ فعلی استفاده می‌شود.</p>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">هدف این بازه هنوز تنظیم نشده است. هیچ مقدار ساختگی جایگزین آن نشده.</div>
+}

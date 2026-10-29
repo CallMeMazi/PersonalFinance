@@ -1,0 +1,72 @@
+@model CategoryListViewModel
+@{
+    ViewData["Title"] = "دسته‌بندی‌ها";
+}
+
+<div class="page-hero">
+    <div>
+        <h1>دسته‌بندی هزینه‌ها</h1>
+        <p class="lede">درصد تخصیص درآمد بین دسته‌ها باید حداکثر ۱۰۰ باشد. باقی‌مانده به‌عنوان تخصیص‌نیافته نمایش داده می‌شود.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create">دسته جدید</a>
+</div>
+
+<div class="stat-grid">
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "درصد تخصیص‌یافته", Value = FormatHelper.Percent(Model.AllocatedPercent), Tone = "primary" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "تخصیص‌نیافته", Value = FormatHelper.Percent(Model.UnallocatedPercent), Tone = "warning" }' />
+</div>
+
+<div class="panel">
+    <div class="progress pf-progress mb-3">
+        <div class="progress-bar" style="width: @(Math.Min(100, Model.AllocatedPercent))%"></div>
+    </div>
+    @if (!Model.Items.Any())
+    {
+        <partial name="_EmptyState" model='"دسته‌بندی‌ای وجود ندارد."' />
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>دسته</th>
+                        <th>درصد تخصیص</th>
+                        <th>تعداد هزینه</th>
+                        <th>توضیحات</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>
+                            <span class="color-dot" style="background:@item.Color"></span>
+                            @item.Icon @item.Title
+                        </td>
+                        <td>@FormatHelper.Percent(item.AllocationPercent)</td>
+                        <td>@FormatHelper.ToPersianDigits(item.ExpenseCount.ToString())</td>
+                        <td>@(item.Description ?? "—")</td>
+                        <td>
+                            <div class="table-actions">
+                                <a class="btn btn-sm btn-outline-light" asp-action="Edit" asp-route-id="@item.Id">ویرایش</a>
+                                @if (item.ExpenseCount == 0)
+                                {
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="js-confirm-delete" data-message="این دسته‌بندی حذف شود؟">
+                                        <button class="btn btn-sm btn-danger" type="submit">حذف</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-sm btn-danger" type="button" disabled title="این دسته هزینه وابسته دارد">حذف</button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

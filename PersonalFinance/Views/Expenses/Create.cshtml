@@ -1,0 +1,23 @@
+@model ExpenseFormViewModel
+@{
+    ViewData["Title"] = "ثبت هزینه";
+}
+
+<div class="page-hero">
+    <div>
+        <h1>ثبت هزینه</h1>
+        <p class="lede">مبلغ را به تومان وارد کنید. تاریخ باید شمسی و معتبر باشد.</p>
+    </div>
+</div>
+
+<div class="panel">
+    <form asp-action="Create" method="post">
+        <partial name="_ExpenseForm" />
+        <button class="btn btn-primary" type="submit">ذخیره</button>
+        <a class="btn btn-outline-light" asp-action="Index">انصراف</a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

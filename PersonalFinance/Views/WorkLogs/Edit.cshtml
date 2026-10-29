@@ -1,0 +1,24 @@
+@model WorkLogFormViewModel
+@{
+    ViewData["Title"] = "ویرایش ساعت کاری";
+}
+
+<div class="page-hero">
+    <div>
+        <h1>ویرایش ساعت کاری</h1>
+        <p class="lede">نرخ ساعتی ذخیره‌شده این روز تغییر نمی‌کند تا گزارش‌های تاریخی دست‌نخورده بمانند.</p>
+    </div>
+</div>
+
+<div class="panel">
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="Id" />
+        <partial name="_WorkLogForm" />
+        <button class="btn btn-primary" type="submit">ذخیره تغییرات</button>
+        <a class="btn btn-outline-light" asp-action="Index">انصراف</a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

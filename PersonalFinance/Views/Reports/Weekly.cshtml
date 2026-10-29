@@ -1,0 +1,41 @@
+@model WeeklyReportPageViewModel
+@{
+    ViewData["Title"] = "گزارش هفتگی";
+}
+
+<div class="page-hero">
+    <div>
+        <h1>گزارش هفتگی</h1>
+        <p class="lede">@Model.Report.RangeLabel</p>
+    </div>
+</div>
+
+<div class="panel">
+    <form method="get" class="filter-bar">
+        <div>
+            <label class="form-label">انتخاب هفته شمسی</label>
+            <select name="week" class="form-select" onchange="this.form.submit()">
+                @foreach (var week in Model.WeekOptions)
+                {
+                    if (week.WeekStart == Model.WeekStart)
+                    {
+                        <option value="@week.WeekStart.ToString("yyyy-MM-dd")" selected>@week.Label</option>
+                    }
+                    else
+                    {
+                        <option value="@week.WeekStart.ToString("yyyy-MM-dd")">@week.Label</option>
+                    }
+                }
+            </select>
+        </div>
+    </form>
+</div>
+
+<partial name="_PeriodSummary" model="Model.Report" />
+
+<div class="stat-grid">
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "بیشترین دسته هزینه", Value = string.IsNullOrEmpty(Model.Report.TopCategoryName) ? "بدون هزینه" : Model.Report.TopCategoryName, Tone = "expense", Hint = string.IsNullOrEmpty(Model.Report.TopCategoryName) ? null : FormatHelper.TomanWithUnit(Model.Report.TopCategoryAmount) }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "وضعیت مالی هفته", Value = Model.Report.FinanceStatus, Tone = Model.Report.NetIncome < 0 ? "expense" : "income" }' />
+</div>
+
+<partial name="_BudgetTable" model="Model.Report" />

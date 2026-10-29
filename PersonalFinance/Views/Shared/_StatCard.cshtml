@@ -1,0 +1,9 @@
+@model StatCardViewModel
+<div class="stat-card tone-@Model.Tone">
+    <div class="stat-card-label">@Model.Title</div>
+    <div class="stat-card-value">@Model.Value</div>
+    @if (!string.IsNullOrWhiteSpace(Model.Hint))
+    {
+        <div class="stat-card-hint">@Model.Hint</div>
+    }
+</div>

@@ -1,0 +1,39 @@
+@model HourlyRateViewModel
+@{
+    ViewData["Title"] = "درآمد ساعتی";
+}
+
+<div class="page-hero">
+    <div>
+        <h1>نرخ درآمد ساعتی</h1>
+        <p class="lede">نرخ فعلی برای ثبت‌های جدید استفاده می‌شود. درآمد روزهای قبلی با نرخی که همان روز ذخیره شده محاسبه می‌ماند.</p>
+    </div>
+</div>
+
+<div class="stat-grid">
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "نرخ فعلی", Value = FormatHelper.TomanWithUnit(Model.CurrentRate), Tone = "primary", Hint = Model.UpdatedAt is null ? null : "آخرین تغییر: " + PersianDateHelper.ToShamsiDisplay(Model.UpdatedAt.Value) }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "مجموع ساعات ثبت‌شده", Value = FormatHelper.Hours(Model.AllTimeHours) + " ساعت", Tone = "info" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "مجموع درآمد حاصل از کار", Value = FormatHelper.TomanWithUnit(Model.AllTimeIncome), Tone = "income" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "درآمد مورد انتظار این ماه", Value = Model.Month.ExpectedIncome is null ? "هدف ماه تنظیم نشده" : FormatHelper.TomanWithUnit(Model.Month.ExpectedIncome.Value), Tone = "accent" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "درآمد واقعی این ماه", Value = FormatHelper.TomanWithUnit(Model.Month.ActualIncome), Tone = "income" }' />
+    <partial name="_StatCard" model='new StatCardViewModel { Title = "تفاوت با درآمد هدف", Value = Model.Month.IncomeDifference is null ? "—" : FormatHelper.SignedToman(Model.Month.IncomeDifference.Value), Tone = Model.Month.IncomeDifference is < 0 ? "warning" : "income" }' />
+</div>
+
+<div class="panel">
+    <h2 class="panel-title">ویرایش نرخ</h2>
+    <form asp-action="Index" method="post" class="form-grid">
+        <div>
+            <label asp-for="HourlyRate" class="form-label"></label>
+            <input asp-for="HourlyRate" class="form-control" type="number" min="0" step="1000" />
+            <span asp-validation-for="HourlyRate" class="text-danger"></span>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">ذخیره نرخ</button>
+        </div>
+    </form>
+    <div class="note mt-3">مثال: اگر نرخ ۲۰۰٬۰۰۰ تومان باشد و یک روز ۶ ساعت کار کنید، درآمد آن روز ۱٬۲۰۰٬۰۰۰ تومان است.</div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

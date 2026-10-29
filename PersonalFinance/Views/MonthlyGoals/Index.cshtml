@@ -1,0 +1,63 @@
+@model MonthlyGoalPageViewModel
+@{
+    ViewData["Title"] = "هدف ماهانه";
+}
+
+<div class="page-hero">
+    <div>
+        <h1>هدف ساعات کاری ماهانه</h1>
+        <p class="lede">برای هر ماه شمسی می‌توانید هدف جداگانه‌ای تعیین کنید. اگر هدف ماه مشخص نشده باشد، هیچ عدد ساختگی نمایش داده نمی‌شود.</p>
+    </div>
+</div>
+
+<div class="panel">
+    <form method="get" class="filter-bar mb-3">
+        <div>
+            <label class="form-label">ماه شمسی</label>
+            <select class="form-select" name="monthKey" onchange="applyMonth(this)">
+                @foreach (var item in Model.MonthOptions)
+                {
+                    var selected = item.Year == Model.Year && item.Month == Model.Month;
+                    if (selected)
+                    {
+                        <option value="@item.Year-@item.Month" selected>@item.Title</option>
+                    }
+                    else
+                    {
+                        <option value="@item.Year-@item.Month">@item.Title</option>
+                    }
+                }
+            </select>
+            <input type="hidden" name="year" value="@Model.Year" />
+            <input type="hidden" name="month" value="@Model.Month" />
+        </div>
+    </form>
+    <form asp-action="Index" method="post" class="form-grid">
+        <input type="hidden" asp-for="Year" />
+        <input type="hidden" asp-for="Month" />
+        <div>
+            <label asp-for="TargetHours" class="form-label"></label>
+            <input asp-for="TargetHours" class="form-control" type="number" step="0.5" min="0.01" max="744" />
+            <span asp-validation-for="TargetHours" class="text-danger"></span>
+        </div>
+        <div>
+            <button class="btn btn-primary" type="submit">ذخیره هدف ماه</button>
+        </div>
+    </form>
+</div>
+
+<partial name="_PeriodSummary" model="Model.Report" />
+<partial name="_BudgetTable" model="Model.Report" />
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function applyMonth(select) {
+            var parts = select.value.split("-");
+            var form = select.form;
+            form.year.value = parts[0];
+            form.month.value = parts[1];
+            form.submit();
+        }
+    </script>
+}
